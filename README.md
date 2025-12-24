@@ -189,6 +189,7 @@ cd ./nodeapp/
     roles/iam.serviceAccountTokenCreator
     roles/iam.serviceAccountUser
     roles/storage.admin
+    roles/artifactregistry.writer
     ```
   - Add IAM Policy bindings with Github repo, Identity provider and service account.
     ```sh
@@ -198,6 +199,15 @@ cd ./nodeapp/
     --member="principalSet://iam.googleapis.com/projects/${GCP_PROJECT_NUMBER}/locations/global/workloadIdentityPools/k8s-pool/attribute.repository/${GITHUB_REPO}"
     ```
 
+Enable Authenticate to Google Cloud
+
+gcloud services enable iamcredentials.googleapis.com \
+  --project="${GCP_PROJECT_ID}"
+
+Enabel Authenticate to Google Artifactregistry
+
+gcloud services enable artifactregistry.googleapis.com \
+  --project="${GCP_PROJECT_ID}"
 
 - [x] Create a bucket in GCS for storing terraform state file.
 - [x] Get your GCP Project number for reference.
