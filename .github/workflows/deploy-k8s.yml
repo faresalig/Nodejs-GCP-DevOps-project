@@ -26,12 +26,8 @@ jobs:
           workload_identity_provider: 'projects/772024726652/locations/global/workloadIdentityPools/k8s-pool/providers/k8s-provider'
           service_account: computeadmin-827@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com
       - uses: 'google-github-actions/setup-gcloud@v1'
-        with:
-          token_format: 'access_token'
-          workload_identity_provider: 'projects/772024726652/locations/global/workloadIdentityPools/k8s-pool/providers/k8s-provider'
-          service_account: computeadmin-827@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com
       - name: Docker auth
-        run: gcloud auth configure-docker
+        run: gcloud auth configure-docker --quiet
       - name: Build and push docker image 
         run: |
           docker build -t us-central1-docker.pkg.dev/$GCP_PROJECT_ID/nodeapprepo/nodeappimage:$IMAGE_TAG .
