@@ -1,9 +1,9 @@
 name: Deploy to Kubernetes
 on:
   push:
-    branches:
-      - "main"
+    branches: [main]
   workflow_dispatch:
+  
 env:
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   TF_STATE_BUCKET_NAME: ${{ secrets.GCP_TF_STATE_BUCKET }}
