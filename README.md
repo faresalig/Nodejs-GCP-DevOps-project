@@ -1,167 +1,49 @@
 <img src="https://img.shields.io/github/forks/tush-tr/DevOps-Projects"> <img src="https://img.shields.io/github/license/tush-tr/DevOps-Projects"> <img src="https://img.shields.io/github/stars/tush-tr/DevOps-Projects"> <a href="https://twitter.com/tush_tr604" target="blank"><img src="https://img.shields.io/twitter/follow/tush_tr604?logo=twitter&style=flat" alt="tush_tr604" /></a>
 
-# Complete CI/CD with Kubernetes/Docker, Terraform and GKE(Google Kubernetes Engine) 
-### Tech used:
-- Node.js
-- Docker
-- Kubernetes
-- Terraform
-- GitHub Actions
-- GKE(Google Kubernetes Engine)
-- GCR(Google Container Registry)
+# Node.js DevOps Project with GCP, Kubernetes & Terraform
 
-<p>
-<img src="https://raw.githubusercontent.com/tush-tr/tush-tr/master/res/docker.gif" height="36" width="36" >
-<img src="https://raw.githubusercontent.com/tush-tr/tush-tr/master/res/kubernetes.svg.png"  height="36" width="36" ><img src="https://raw.githubusercontent.com/tush-tr/tush-tr/master/res/social-icon-google-cloud-1200-630.png" height="36" ><img src="https://raw.githubusercontent.com/itsksaurabh/itsksaurabh/master/assets/terraform.gif" height="36" ></p>
+A complete CI/CD pipeline demonstrating modern DevOps practices using Node.js application deployment to Google Kubernetes Engine (GKE) with Infrastructure as Code.
 
-# Steps
-- [x] Create a simple nodejs/express application by running:
-cd ./nodeapp/
-    npm init -y
-    npm i express
-- [x] Write Dockerfile for the application
-    ```Dockerfile
-    FROM --platform=linux/amd64 node:14
-    WORKDIR /usr/app
-    COPY package.json .
-    RUN npm install
-    COPY . .
-    EXPOSE 80
-    CMD ["node","app.js"]
-    ```
-- [x] Write Terraform scripts for GKE Cluster, Deployment and service.
-  - ```providers.tf```: use google and kubernetes providers
-    ```sh
-    terraform {
-      required_version = ">= 0.12"
-      backend "gcs" {
-      }
-    }
-    provider "google" {
-      project = var.project_id
-      region  = var.region
-    }
-    provider "kubernetes" {
-      host  = google_container_cluster.default.endpoint
-      token = data.google_client_config.current.access_token
-      client_certificate = base64decode(
-        google_container_cluster.default.master_auth[0].client_certificate,
-      )
-      client_key = base64decode(google_container_cluster.default.master_auth[0].client_key)
-      cluster_ca_certificate = base64decode(
-        google_container_cluster.default.master_auth[0].cluster_ca_certificate,
-      )
-    }
-    ```
-  - ```main.tf```: for creating GKE Cluster
-    ```sh
-    data "google_container_engine_versions" "default" {
-      location = "us-central1-c"
-    }
-    data "google_client_config" "current" {
-    }
+## 🚀 Features
 
-    resource "google_container_cluster" "default" {
-      name               = "my-first-cluster"
-      location           = "us-central1-c"
-      initial_node_count = 3
-      min_master_version = data.google_container_engine_versions.default.latest_master_version
+- **Node.js Express Application** - Simple web application containerized with Docker
+- **Infrastructure as Code** - GKE cluster provisioning using Terraform
+- **CI/CD Pipeline** - Automated deployment with GitHub Actions
+- **Container Registry** - Docker images stored in Google Artifact Registry
+- **Kubernetes Orchestration** - Application deployment with LoadBalancer service
+- **OIDC Authentication** - Secure GitHub-to-GCP authentication without service account keys
 
-      node_config {
-        machine_type = "g1-small"
-        disk_size_gb = 32
-      }
+## 🛠️ Tech Stack
 
-      provisioner "local-exec" {
-        when    = destroy
-        command = "sleep 90"
-      }
-    }
-    ```
-  - ```k8s.tf```: For deployment and service deployment on K8s
-    ```sh
-    resource "kubernetes_deployment" "name" {
-      metadata {
-        name = "nodeappdeployment"
-        labels = {
-          "type" = "backend"
-          "app"  = "nodeapp"
-        }
-      }
-      spec {
-        replicas = 1
-        selector {
-          match_labels = {
-            "type" = "backend"
-            "app"  = "nodeapp"
-          }
-        }
-        template {
-          metadata {
-            name = "nodeapppod"
-            labels = {
-              "type" = "backend"
-              "app"  = "nodeapp"
-            }
-          }
-          spec {
-            container {
-              name  = "nodecontainer"
-              image = var.container_image
-              port {
-                container_port = 80
-              }
-            }
-          }
-        }
-      }
-    }
-    resource "google_compute_address" "default" {
-      name   = "ipforservice"
-      region = var.region
-    }
-    resource "kubernetes_service" "appservice" {
-      metadata {
-        name = "nodeapp-lb-service"
-      }
-      spec {
-        type             = "LoadBalancer"
-        load_balancer_ip = google_compute_address.default.address
-        port {
-          port        = 80
-          target_port = 80
-        }
-        selector = {
-          "type" = "backend"
-          "app"  = "nodeapp"
-        }
-      }
-    }
-    ```
-  - ```variables.tf```
-    ```sh
-    variable "region" {
-    }
-    variable "project_id" {
-    }
-    variable "container_image" {
-    }
-    ```
-  - ```outputs.tf```
-    ```sh
-    output "cluster_name" {
-      value = google_container_cluster.default.name
-    }
-    output "cluster_endpoint" {
-      value = google_container_cluster.default.endpoint
-    }
-    output "cluster_location" {
-      value = google_container_cluster.default.location
-    }
-    output "load-balancer-ip" {
-      value = google_compute_address.default.address
-    }
-    ```
+- **Runtime**: Node.js, Express
+- **Containerization**: Docker
+- **Orchestration**: Kubernetes (GKE)
+- **Infrastructure**: Terraform
+- **CI/CD**: GitHub Actions
+- **Cloud Provider**: Google Cloud Platform
+- **Container Registry**: Google Artifact Registry
+
+## 📁 Project Structure
+
+```
+├── nodeapp/           # Node.js application source code
+├── terraform/         # Terraform infrastructure files
+├── .github/workflows/ # GitHub Actions CI/CD pipeline
+└── README.md         # Project documentation
+```
+
+## 🔧 Key Components
+
+- **GKE Cluster**: Managed Kubernetes cluster on Google Cloud
+- **Terraform Modules**: Infrastructure provisioning and management
+- **GitHub OIDC**: Keyless authentication for secure deployments
+- **LoadBalancer Service**: External access to the application
+- **Automated Pipeline**: Build, test, and deploy on every push
+
+This project demonstrates enterprise-grade DevOps practices with cloud-native technologies and GitOps workflows.
+
+## Setup Instructions
+
 - [x] Setup Github OIDC Authentication with GCP
   - Create a new workload Identity pool
     ```sh
