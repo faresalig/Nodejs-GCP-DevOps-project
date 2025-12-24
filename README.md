@@ -172,13 +172,14 @@ cd ./nodeapp/
     ```
   - Create a oidc identity provider for authenticating with Github
     ```sh
-    gcloud iam workload-identity-pools providers create-oidc "k8s-provider" \
-    --project="${PROJECT_ID}" \
-    --location="global" \
-    --workload-identity-pool="k8s-pool" \
-    --display-name="k8s provider" \
-    --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.aud=assertion.aud" \
-    --issuer-uri="https://token.actions.githubusercontent.com"
+    gcloud iam workload-identity-pools providers create-oidc k8s-provider \
+  --project= ${GCP_PROJECT_ID} \
+  --location=global \
+  --workload-identity-pool=k8s-pool \
+  --display-name="GitHub Actions Provider" \
+  --issuer-uri="https://token.actions.githubusercontent.com" \
+  --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository" \
+  --attribute-condition="assertion.repository=='faresalig/Nodejs-GCP-DevOps-project'"
     ```
   - Create a service account with these permissions
     ```sh
