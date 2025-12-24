@@ -30,8 +30,8 @@ jobs:
         run: gcloud auth configure-docker
       - name: Build and push docker image 
         run: |
-          docker build -t us.gcr.io/$GCP_PROJECT_ID/nodeappimage:$IMAGE_TAG .
-          docker push us.gcr.io/$GCP_PROJECT_ID/nodeappimage:$IMAGE_TAG
+          docker build -t us-central1-docker.pkg.dev/$GCP_PROJECT_ID/nodeapprepo/nodeappimage:$IMAGE_TAG .
+          docker push us-central1-docker.pkg.dev/$GCP_PROJECT_ID/nodeapprepo/nodeappimage:$IMAGE_TAG
         working-directory: ./nodeapp
       - uses: hashicorp/setup-terraform@v2
       - name: Terraform init
@@ -42,7 +42,7 @@ jobs:
           terraform plan -destroy \
           -var="region=us-central1-c" \
           -var="project_id=$GCP_PROJECT_ID" \
-          -var="container_image=us.gcr.io/$GCP_PROJECT_ID/nodeappimage:$IMAGE_TAG" \
+          -var="container_image=us-central1-docker.pkg.dev/$GCP_PROJECT_ID/nodeapprepo/nodeappimage:$IMAGE_TAG" \
           -out=PLAN
         working-directory: ./terraform
       - name: Terraform apply
